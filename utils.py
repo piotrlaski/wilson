@@ -46,19 +46,34 @@ def hkl_ratios_to_sinthetasq_logr(angles: list, lengths: list, file: os.PathLike
         out_array = np.append(out_array, [[sint_lam_sq, log_ratio]], axis = 0)
     return out_array
 
-def linfit(angles: list, lengths: list, file: os.PathLike, plot: bool=False) -> tuple:
+def linfit(angles: list, lengths: list, ratio_file: os.PathLike, plot: bool=False, plot_output_dir: os.PathLike=None, plot_X_axis_max = 0.5, export_csv_graph=False, export_csv_output_dir: os.PathLike=None) -> tuple:
+    ratio_file_name = os.path.splitext(os.path.split(ratio_file)[1])[0]
+    if plot_output_dir is None and plot is True:
+        print (f'!Plot_output_path not specified, plot created in ratio file location!')
+        plot_output_dir = os.path.split(ratio_file)[0]
+    if export_csv_output_dir is None and export_csv_graph is True:
+        print (f'!export_csv_graph not specified, plot exported data created in ratio file location!')
+        export_csv_output_dir = os.path.split(ratio_file)[0]
+
     ## do a linear regression of ln(R) = a * (sinth/lam)^2 + b
-    out_array = hkl_ratios_to_sinthetasq_logr(angles, lengths, file)
+    out_array = hkl_ratios_to_sinthetasq_logr(angles, lengths, ratio_file)
     out_array_trans = np.transpose(out_array)
     x, y = out_array_trans
     a, b = np.polyfit(x, y, deg = 1)
+    ## export a csv file of the plot
+    if export_csv_graph:
+        csv_name = os.path.join(export_csv_output_dir, ratio_file_name) + '.csv'
+        np.savetxt(csv_name, out_array, delimiter=' ')
     ## scatter plot with the fitted line
     if plot:
         plt.scatter(x,y, s=1)
         plt.axline(xy1=(0, b), slope=a, color='r', label=f'$y = {a:.2f}x {b:+.2f}$')
-        plt.legend()
-        plot_name = os.path.splitext(file)[0] + '.png'
+        plt.legend(loc='upper right')
+        plt.xlim(0, plot_X_axis_max)
+        plt.ylim(-1, 1)
+        plot_name = os.path.join(plot_output_dir, ratio_file_name) + '.png'
         plt.savefig(plot_name)
+        plt.close()
     return (a,b)
 
 def read_cif(file: os.PathLike) -> tuple[list, list, float]:
@@ -108,9 +123,9 @@ def del_t_calc(avg_Uani: float, del_B: float, T_off: float) -> float:
     del_T = (((B_off + del_B) / B_off) - 1) * T_off
     return (del_T)
 
-def calc_kb_del_T(cif_file: os.PathLike, ratios_file: os.PathLike, plot: bool=False) -> tuple[float, float]:
+def calc_kb_del_T(cif_file: os.PathLike, ratios_file: os.PathLike, plot: bool=False, plot_output_dir: os.PathLike=None, plot_X_axis_max = 0.5, export_csv_graph = False, export_csv_output_dir: os.PathLike=None) -> tuple[float, float]:
     angles, lengths, avg_Uani, temp = read_cif(cif_file)
-    a, b = linfit(angles, lengths, ratios_file, plot)
+    a, b = linfit(angles, lengths, ratios_file, plot, plot_output_dir, plot_X_axis_max, export_csv_graph, export_csv_output_dir)
     del_B = -a / 2
     kb = kb_calc(avg_Uani, del_B)
     del_T = del_t_calc(avg_Uani, del_B, temp)
