@@ -1,6 +1,8 @@
 # PhotoWilson
 
-PhotoWilson is a tool for calculating photoinduced temperature changes in crystals after photoexcitation based on laser ON/laser OFF intensity ratios of X-ray reflections.
+PhotoWilson is a tool for calculating photoinduced temperature changes in crystals after photoexcitation based on laser ON/laser OFF intensity ratios of indexed X-ray reflections. 
+It is the public version of the project "TRL_Photowilson", which is referenced in my thesis. 
+
 
 ## Getting Started
 
@@ -12,12 +14,12 @@ You will need two input files:
 
 1. **A .cif file** containing crystallographic information including:
    - Unit cell parameters (a, b, c, α, β, γ)
-   - Temperature measurement data
-   - Atomic displacement parameters (Uani values)
+   - Temperature of the measurement
+   - Anisotropic atomic displacement parameters (Uani values)
 
 2. **A .hkl file** containing reflection intensity ratios with columns for:
    - Miller indices (h, k, l)
-   - Intensity ratios (laser ON/laser OFF)
+   - Intensity ratios (laser ON/laser OFF) for each triplet of indices
 
 ## Usage
 
@@ -34,10 +36,10 @@ kb, del_T = calc_kb_del_T(cif_file_path, ratios_file_path, plot=True)
 
 The tool calculates and returns:
 
-1. **Kb value** - A scaling factor related to the structural changes
+1. **Kb value** - The temperature scaling factor related to the structural changes
 2. **ΔT (del_T)** - The photoinduced temperature change in Kelvin
 
-When `plot=True` is specified, the tool generates a PhotoWilson scatter plot showing the relationship between (sin θ/λ)² and ln(intensity ratios), saved as a .png file in the same directory as your input ratios file [1].
+When `plot=True` is specified, the tool generates a PhotoWilson scatter plot showing the relationship between (sin θ/λ)² and ln(intensity ratios), saved as a .png file in the same directory as your input ratios file.
 
 ## Methodology
 
