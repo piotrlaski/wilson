@@ -1,7 +1,8 @@
 # PhotoWilson
 
 PhotoWilson is a tool for calculating photoinduced temperature changes in crystals after photoexcitation based on laser ON/laser OFF intensity ratios of indexed X-ray reflections. 
-It is the public version of the project "TRL_Photowilson", which is referenced in my thesis. 
+
+It is the public version of the project "TRL_Photowilson", which is referenced in my thesis (chapter 1.4.2.5 p.50-52). 
 
 
 ## Getting Started
